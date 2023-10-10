@@ -1,27 +1,90 @@
-# neural_networks_solomonoff_induction
+# Neural Networks and Solomonoff Induction
 
-TODO(b/303629202): Add a description for your new project, explain what is
-being released here, etc... Additional, the following sections are normally
-expected for all releases. Feel free to add additional sections if appropriate
-for your project.
+This repository provides an implementation of our paper Neural Networks and Solomonoff Induction.
+
+>   Solomonoff Induction (SI) is the most powerful universal predictor given unlimited computational resources. Naive SI approximations are challenging and require running vast amount of programs for extremely long. Here we explore an alternative path to SI consisting in meta-training neural networks on universal data sources.
+We generate the training data by feeding random programs to Universal Turing Machines (UTMs) and guarantee convergence in the limit to various SI variants (under certain assumptions). We provide novel results on how a non-uniform distribution over programs still maintain the universality property. Experimentally, we investigate the effect neural network architectures (i.e. LSTMs, Transformers, etc.) and sizes on their performance on algorithmic data, crucial for SI. First, we consider variable-order Markov sources where the Bayes-optimal predictor is the well-known Context Tree Weighting (CTW) algorithm.
+Second, we evaluate on challenging algorithmic tasks on Chomsky hierarchy that require different memory structures. Finally, we test on the UTM domain following our theoretical results.  We show that scaling network size always improves performance on all tasks, Transformers outperforming all others, even achieving optimality on par with CTW. Promisingly, large Transformers and LSTMs trained on UTM data exhibit transfer to the other domains.
+
+It is based on [JAX](https://jax.readthedocs.io) and [Haiku](https://dm-haiku.readthedocs.io) and contains all code, datasets, and models necessary to reproduce the paper's results.
+
+
+## Content
+
+```
+.
+├── models
+|   └── ctw.py                    - CTW (Willems, 1995)
+├── data
+|   ├── data_generator.py         - Main abstract class for our data generators.
+|   ├── ctw_data_generator.py.    - Variable-order Markov Source.
+|   ├── utms.py                   - UTM interface and implementation of BrainPhoque.
+|   ├── utm_data_generator.py     - BrainPhoque UTM Source, from randomly sampled programs.
+|   ├── chomsky_data_generator.py - Chomsky Task Source, for a single task.
+|   └── meta_data_generator.py    - Sampling from multiple generators.
+├── README.md
+└── requirements.txt              - Dependencies
+```
+
+`data` contains all data generators. They all inherit the abstract class `DataGenerator`, defined in `data/data_generator.py`.
+
+`models` contains all the models we use, written in [jax](https://github.com/google/jax) and [haiku](https://github.com/deepmind/dm-haiku), two open source libraries.
+
 
 ## Installation
 
-Write instructions for how the user should install your code. The instructions
-should ideally be valid when copy-pasted. You can combine this with the Usage
-section if there's no separate installation step.
+Clone the source code into a local directory:
+```bash
+git clone https://github.com/deepmind/neural_networks_solomonoff_induction.git
+cd neural_networks_solomonoff_induction
+```
 
-## Usage
+`pip install -r requirements.txt` will install all required dependencies.
+This is best done inside a [conda environment](https://www.anaconda.com/).
+To that end, install [Anaconda](https://www.anaconda.com/download#downloads).
+Then, create and activate the conda environment:
+```bash
+conda create --name nnsi
+conda activate nnsi
+```
 
-Write example usage of your code. The instructions should ideally be valid when
-copy-pasted, and will be used by your technical reviewer to verify that your
-package functions correctly.
+Install `pip` and use it to install all the dependencies:
+```bash
+conda install pip
+pip install -r requirements.txt
+```
 
-## Citing this work
+If you have a GPU available (highly recommended for fast training), then you can install JAX with CUDA support.
+```bash
+pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+```
+Note that the jax version must correspond to the existing CUDA installation you wish to use (CUDA 12 in the example above).
+Please see the [JAX documentation](https://github.com/google/jax#installation) for more details.
 
-Add citation details here, usually a pastable BibTeX snippet.
 
-## License and disclaimer
+## Citing This Work
+
+```bibtex
+@article{grau2023neural,
+  author       = {Jordi Grau{-}Moya and
+                  Tim Genewein and
+                  Marcus Hutter and
+                  Laurent Orseau and
+                  Gr{\'{e}}goire Del{\'{e}}tang and
+                  Elliot Catt and
+                  Anian Ruoss and
+                  Christopher Mattern and
+                  Li Kevin Wenliang and
+                  Matthew Aitchison and
+                  Joel Veness},
+  title        = {Neural Networks and Solomonoff Induction},
+  journal      = {arXiv:TODO},
+  year         = {2023}
+}
+```
+
+
+## License and Disclaimer
 
 Copyright 2023 DeepMind Technologies Limited
 
