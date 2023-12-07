@@ -25,8 +25,6 @@ import numpy as np
 from neural_networks_solomonoff_induction.data import data_generator as dg_lib
 from neural_networks_solomonoff_induction.data import utms
 
-_MAX_PROGRAM_LENGTH = 100
-
 
 class Tokenizer(enum.IntEnum):
   """Method to use to convert an output string to a list of integers."""
@@ -47,6 +45,7 @@ class UTMDataGenerator(dg_lib.DataGenerator):
       memory_size: int,
       maximum_steps: int,
       tokenizer: Tokenizer,
+      maximum_program_length: int = 100,
   ):
     """Initializes the UTM data generator.
 
@@ -64,12 +63,14 @@ class UTMDataGenerator(dg_lib.DataGenerator):
         which it will send a TimeoutError.
       tokenizer: The tokenizer that maps the outputs of the UTM (characters) to
         integers.
+      maximum_program_length: Maximum length of the sampled programs.
     """
     super().__init__(batch_size, seq_length, rng)
     self._utm = utm
     self._memory_size = memory_size
     self._maximum_steps = maximum_steps
     self._tokenizer = tokenizer
+    self._maximum_program_length = maximum_program_length
 
     self._token_position: dict[str, int] | None = None
     if tokenizer == Tokenizer.SEQ_POSITION:
@@ -102,7 +103,9 @@ class UTMDataGenerator(dg_lib.DataGenerator):
     """
     programs = []
     for _ in range(sample_size):
-      programs.append(self._utm.sample_program(_MAX_PROGRAM_LENGTH, self._rng))
+      programs.append(
+          self._utm.sample_program(self._maximum_program_length, self._rng)
+      )
 
     return programs
 
@@ -131,6 +134,7 @@ class UTMDataGenerator(dg_lib.DataGenerator):
     """
     outputs = []
     results = []
+    masks = []
     for program in params:
       result = self._utm.run_program(
           program=program,
@@ -142,8 +146,11 @@ class UTMDataGenerator(dg_lib.DataGenerator):
       # We keep only the sequences that are long enough.
       # result['output_length'] = len(result['output']) unless some padding
       # is used in the UTM.
+      mask = np.zeros(self._seq_length, dtype=np.uint8)
       if result['output_length'] != self._seq_length:
-        output += '\x00' * (self._seq_length - result['output_length'])
+        padding_length = self._seq_length - result['output_length']
+        output += '\x00' * padding_length
+        mask[-padding_length:] = 1
       assert len(output) == self._seq_length
       match self._tokenizer:
         case Tokenizer.ASCII:
@@ -159,11 +166,14 @@ class UTMDataGenerator(dg_lib.DataGenerator):
           )
       outputs.append(output)
       results.append(result)
+      masks.append(mask)
 
+    loss_mask = jnp.asarray(masks)
     output = jnp.asarray(outputs)
     output = jnn.one_hot(output, num_classes=self.feature_size, dtype=jnp.uint8)
     # In this case, the probabilities for the categorical distribution are
     # delta, meaning there is only one possible next token. They are equal to
     # the one hot output itself.
     categorical_probs = jnp.copy(output)
-    return output, categorical_probs, {'results': results}
+    log_dict = {'results': results, 'loss_mask': loss_mask}
+    return output, categorical_probs, log_dict

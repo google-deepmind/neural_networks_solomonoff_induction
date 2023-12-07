@@ -14,7 +14,8 @@ It is based on [JAX](https://jax.readthedocs.io) and [Haiku](https://dm-haiku.re
 ```
 .
 ├── models
-|   └── ctw.py                    - CTW (Willems, 1995)
+|   ├── ctw.py                    - CTW (Willems, 1995)
+|   └── transformer.py            - Decoder-only Transformer (Vaswani, 2017).
 ├── data
 |   ├── data_generator.py         - Main abstract class for our data generators.
 |   ├── ctw_data_generator.py.    - Variable-order Markov Source.
@@ -23,12 +24,14 @@ It is based on [JAX](https://jax.readthedocs.io) and [Haiku](https://dm-haiku.re
 |   ├── chomsky_data_generator.py - Chomsky Task Source, for a single task.
 |   └── meta_data_generator.py    - Sampling from multiple generators.
 ├── README.md
-└── requirements.txt              - Dependencies
+├── requirements.txt              - Dependencies
+└── train.py                      - Script to train a neural model.
 ```
 
 `data` contains all data generators. They all inherit the abstract class `DataGenerator`, defined in `data/data_generator.py`.
 
-`models` contains all the models we use, written in [jax](https://github.com/google/jax) and [haiku](https://github.com/deepmind/dm-haiku), two open source libraries.
+`models` contains all the neural models we use, written in [jax](https://github.com/google/jax) and [haiku](https://github.com/deepmind/dm-haiku), two open source libraries, and models used for evaluation,
+such as CTW.
 
 
 ## Installation
