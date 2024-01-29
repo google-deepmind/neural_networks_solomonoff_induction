@@ -4,3 +4,4 @@ jax
 jaxtyping
 numpy
 tqdm
+dm-haiku
