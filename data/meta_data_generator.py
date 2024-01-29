@@ -21,7 +21,7 @@ This is used in particular in the paper to sample from multiple Chomsky tasks.
 from typing import Any, Sequence
 import numpy as np
 
-from neural_networks_solomonoff_induction.data import data_generator as dg_lib
+from data import data_generator as dg_lib
 
 
 class MetaDataGenerator(dg_lib.DataGenerator):
