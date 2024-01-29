@@ -28,10 +28,10 @@ import optax
 import tqdm
 import tree
 
-from neural_networks_solomonoff_induction.data import data_generator as dg_lib
-from neural_networks_solomonoff_induction.data import utm_data_generator as utm_dg_lib
-from neural_networks_solomonoff_induction.data import utms as utms_lib
-from neural_networks_solomonoff_induction.models import transformer
+from data import data_generator as dg_lib
+from data import utm_data_generator as utm_dg_lib
+from data import utms as utms_lib
+from models import transformer
 
 
 def _make_loss_fn(model: hk.Transformed) -> Any:
