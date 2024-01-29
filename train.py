@@ -39,14 +39,14 @@ def _make_loss_fn(model: hk.Transformed) -> Any:
 
   def loss_fn(
       params: hk.Params,
-      sequences: jax.Array,
+      sequences: dg_lib.Sequences,
       mask: jax.Array,
   ) -> jnp.float32:
     """Returns the loss for the model and the last state.
 
     Args:
       params: The parameters of the model, usually a neural network.
-      sequences: The input of sequences to evaluate. See neural_predictors.py.
+      sequences: The sequences to evaluate, see type.
       mask: A binary array, True (1's) denote where to skip computing the loss.
     """
     conditionals = model.apply(
