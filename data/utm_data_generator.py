@@ -22,8 +22,8 @@ import jax.nn as jnn
 import jax.numpy as jnp
 import numpy as np
 
-from neural_networks_solomonoff_induction.data import data_generator as dg_lib
-from neural_networks_solomonoff_induction.data import utms
+from data import data_generator as dg_lib
+from data import utms
 
 
 class Tokenizer(enum.IntEnum):
