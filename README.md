@@ -76,12 +76,12 @@ Please see the [JAX documentation](https://github.com/google/jax#installation) f
                   Gr{\'{e}}goire Del{\'{e}}tang and
                   Elliot Catt and
                   Anian Ruoss and
-                  Christopher Mattern and
                   Li Kevin Wenliang and
+                  Christopher Mattern and
                   Matthew Aitchison and
                   Joel Veness},
-  title        = {Neural Networks and Solomonoff Induction},
-  journal      = {arXiv:TODO},
+  title        = {Learning Universal Predictors},
+  journal      = {arXiv:2401.14953},
   year         = {2023}
 }
 ```
