@@ -1,10 +1,15 @@
-# Neural Networks and Solomonoff Induction
+# Learning Universal Predictors
 
-This repository provides an implementation of our paper Neural Networks and Solomonoff Induction.
+This repository provides an implementation of our paper [Learning Universal Predictors](https://arxiv.org/abs/2401.14953).
 
->   Solomonoff Induction (SI) is the most powerful universal predictor given unlimited computational resources. Naive SI approximations are challenging and require running vast amount of programs for extremely long. Here we explore an alternative path to SI consisting in meta-training neural networks on universal data sources.
-We generate the training data by feeding random programs to Universal Turing Machines (UTMs) and guarantee convergence in the limit to various SI variants (under certain assumptions). We provide novel results on how a non-uniform distribution over programs still maintain the universality property. Experimentally, we investigate the effect neural network architectures (i.e. LSTMs, Transformers, etc.) and sizes on their performance on algorithmic data, crucial for SI. First, we consider variable-order Markov sources where the Bayes-optimal predictor is the well-known Context Tree Weighting (CTW) algorithm.
-Second, we evaluate on challenging algorithmic tasks on Chomsky hierarchy that require different memory structures. Finally, we test on the UTM domain following our theoretical results.  We show that scaling network size always improves performance on all tasks, Transformers outperforming all others, even achieving optimality on par with CTW. Promisingly, large Transformers and LSTMs trained on UTM data exhibit transfer to the other domains.
+> Meta-learning has emerged as a powerful approach to train neural networks to learn new tasks quickly from limited data.
+Broad exposure to different tasks leads to versatile representations enabling general problem solving.
+But, what are the limits of meta-learning?
+In this work, we explore the potential of amortizing the most powerful universal predictor, namely Solomonoff Induction (SI), into neural networks via leveraging meta-learning to its limits.
+We use Universal Turing Machines (UTMs) to generate training data used to expose networks to a broad range of patterns.
+We provide theoretical analysis of the UTM data generation processes and meta-training protocols.
+We conduct comprehensive experiments with neural architectures (e.g. LSTMs, Transformers) and algorithmic data generators of varying complexity and universality.
+Our results suggest that UTM data is a valuable resource for meta-learning, and that it can be used to train neural networks capable of learning universal prediction strategies.
 
 It is based on [JAX](https://jax.readthedocs.io) and [Haiku](https://dm-haiku.readthedocs.io) and contains all code, datasets, and models necessary to reproduce the paper's results.
 
@@ -68,7 +73,7 @@ Please see the [JAX documentation](https://github.com/google/jax#installation) f
 ## Citing This Work
 
 ```bibtex
-@article{grau2023neural,
+@article{grau2024learning,
   author       = {Jordi Grau{-}Moya and
                   Tim Genewein and
                   Marcus Hutter and
@@ -82,7 +87,7 @@ Please see the [JAX documentation](https://github.com/google/jax#installation) f
                   Joel Veness},
   title        = {Learning Universal Predictors},
   journal      = {arXiv:2401.14953},
-  year         = {2023}
+  year         = {2024},
 }
 ```
 

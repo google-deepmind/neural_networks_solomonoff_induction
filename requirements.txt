@@ -1,4 +1,5 @@
 absl-py
+dm-haiku
 dm-tree
 jax
 jaxtyping
