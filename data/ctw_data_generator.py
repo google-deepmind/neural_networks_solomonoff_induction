@@ -22,7 +22,7 @@ from typing import Any, Sequence
 import jaxtyping as jtp
 import numpy as np
 
-from data import data_generator as dg_lib
+from neural_networks_solomonoff_induction.data import data_generator as dg_lib
 
 
 # Probability of spawning childrens from a node when creating CTW tree.

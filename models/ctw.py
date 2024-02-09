@@ -36,7 +36,7 @@ from typing import Any, Union
 import jaxtyping as jtp
 import numpy as np
 
-from data import data_generator as dg_lib
+from neural_networks_solomonoff_induction.data import data_generator as dg_lib
 
 # The predictions are log-probabilities (natural logarithm) for the passed
 # sequences. It can either be marginal log-probabilities (i.e. log P(s) for all

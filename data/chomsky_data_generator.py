@@ -23,10 +23,10 @@ Github: https://github.com/google-deepmind/neural_networks_chomsky_hierarchy
 from typing import Any
 
 import jax
-from experiments import constants as chomsky_constants
 import numpy as np
 
-from data import data_generator as dg_lib
+from neural_networks_chomsky_hierarchy.experiments import constants as chomsky_constants
+from neural_networks_solomonoff_induction.data import data_generator as dg_lib
 
 
 # Delimiters are allocated in the last two feature dims of the one-hot vectors.

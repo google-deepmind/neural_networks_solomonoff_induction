@@ -18,25 +18,20 @@ It is based on [JAX](https://jax.readthedocs.io) and [Haiku](https://dm-haiku.re
 
 ```
 .
+├── data
+|   ├── chomsky_data_generator.py - Chomsky Task Source, for a single task.
+|   ├── ctw_data_generator.py.    - Variable-order Markov Source.
+|   ├── data_generator.py         - Main abstract class for our data generators.
+|   ├── meta_data_generator.py    - Sampling from multiple generators.
+|   ├── utm_data_generator.py     - BrainPhoque UTM Source, from randomly sampled programs.
+|   └── utms.py                   - UTM interface and implementation of BrainPhoque.
 ├── models
 |   ├── ctw.py                    - CTW (Willems, 1995)
 |   └── transformer.py            - Decoder-only Transformer (Vaswani, 2017).
-├── data
-|   ├── data_generator.py         - Main abstract class for our data generators.
-|   ├── ctw_data_generator.py.    - Variable-order Markov Source.
-|   ├── utms.py                   - UTM interface and implementation of BrainPhoque.
-|   ├── utm_data_generator.py     - BrainPhoque UTM Source, from randomly sampled programs.
-|   ├── chomsky_data_generator.py - Chomsky Task Source, for a single task.
-|   └── meta_data_generator.py    - Sampling from multiple generators.
 ├── README.md
 ├── requirements.txt              - Dependencies
 └── train.py                      - Script to train a neural model.
 ```
-
-`data` contains all data generators. They all inherit the abstract class `DataGenerator`, defined in `data/data_generator.py`.
-
-`models` contains all the neural models we use, written in [jax](https://github.com/google/jax) and [haiku](https://github.com/deepmind/dm-haiku), two open source libraries, and models used for evaluation,
-such as CTW.
 
 
 ## Installation
@@ -87,7 +82,7 @@ Please see the [JAX documentation](https://github.com/google/jax#installation) f
                   Joel Veness},
   title        = {Learning Universal Predictors},
   journal      = {arXiv:2401.14953},
-  year         = {2024},
+  year         = {2024}
 }
 ```
 
