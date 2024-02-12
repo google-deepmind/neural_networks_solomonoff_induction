@@ -57,7 +57,7 @@ def _make_loss_fn(model: hk.Transformed) -> Any:
     true_conditionals = jnp.take_along_axis(
         conditionals, sequences[..., None], axis=-1
     )[..., 0]
-    true_conditionals = jnp.multiply(mask, true_conditionals)
+    true_conditionals = jnp.where(mask, 0.0, true_conditionals)
     marginals = jnp.sum(true_conditionals, axis=1)  # Shape (B,).
     return -jnp.mean(marginals)
 
