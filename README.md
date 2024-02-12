@@ -82,7 +82,7 @@ Please see the [JAX documentation](https://github.com/google/jax#installation) f
                   Joel Veness},
   title        = {Learning Universal Predictors},
   journal      = {arXiv:2401.14953},
-  year         = {2024}
+  year         = {2024},
 }
 ```
 
