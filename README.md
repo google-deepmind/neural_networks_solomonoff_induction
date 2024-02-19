@@ -43,7 +43,7 @@ such as CTW.
 
 Clone the source code into a local directory:
 ```bash
-git clone https://github.com/deepmind/neural_networks_solomonoff_induction.git
+git clone https://github.com/google-deepmind/neural_networks_solomonoff_induction.git
 cd neural_networks_solomonoff_induction
 ```
 
