@@ -28,10 +28,10 @@ import optax
 import tqdm
 import tree
 
-from data import data_generator as dg_lib
-from data import utm_data_generator as utm_dg_lib
-from data import utms as utms_lib
-from models import transformer
+from google3.third_party.deepmind.neural_networks_solomonoff_induction.data import data_generator as dg_lib
+from google3.third_party.deepmind.neural_networks_solomonoff_induction.data import utm_data_generator as utm_dg_lib
+from google3.third_party.deepmind.neural_networks_solomonoff_induction.data import utms as utms_lib
+from google3.third_party.deepmind.neural_networks_solomonoff_induction.models import transformer
 
 
 def _make_loss_fn(model: hk.Transformed) -> Any:
@@ -39,14 +39,14 @@ def _make_loss_fn(model: hk.Transformed) -> Any:
 
   def loss_fn(
       params: hk.Params,
-      sequences: dg_lib.Sequences,
+      sequences: jax.Array,
       mask: jax.Array,
   ) -> jnp.float32:
     """Returns the loss for the model and the last state.
 
     Args:
       params: The parameters of the model, usually a neural network.
-      sequences: The sequences to evaluate, see type.
+      sequences: The input of sequences to evaluate. See neural_predictors.py.
       mask: A binary array, True (1's) denote where to skip computing the loss.
     """
     conditionals = model.apply(
@@ -163,7 +163,6 @@ def train_transformer_decoder(
       loss_mask = log_dict['loss_mask']
     else:
       loss_mask = default_mask(batch)
-    logging.info('Batch fetched.')
 
     params, opt_state, logs = _update_parameters(
         params=params,
@@ -175,7 +174,7 @@ def train_transformer_decoder(
     )
     if log_every > 0 and step % log_every == 0:
       logging.info(
-          'Step %f, Loss %f, Grad norm %f',
+          'Step %d, Loss (avg cumulative nats) %f, Grad norm %f',
           step,
           logs['loss'],
           logs['grad_norm_unclipped'],
@@ -187,11 +186,13 @@ def train_transformer_decoder(
 
 def main(_) -> None:
   """Trains a model and save the parameters to a file."""
-  utm = utms_lib.BrainPhoqueUTM()
+  rng = np.random.default_rng(seed=1)
+  program_sampler = utms_lib.FastSampler(rng=rng)
+  utm = utms_lib.BrainPhoqueUTM(program_sampler)
   data_generator = utm_dg_lib.UTMDataGenerator(
       batch_size=32,
       seq_length=256,
-      rng=1,
+      rng=rng,
       utm=utm,
       memory_size=10,
       maximum_steps=100,
