@@ -15,8 +15,9 @@
 
 """Data generator for UTMs, used to sample sequences from programs."""
 
+from collections.abc import Sequence
 import enum
-from typing import Any, Dict, Sequence
+from typing import Any
 
 import jax.nn as jnn
 import jax.numpy as jnp
@@ -112,7 +113,7 @@ class UTMDataGenerator(dg_lib.DataGenerator):
   def sample_from_params(
       self,
       params: Sequence[str],
-  ) -> tuple[dg_lib.Sequences, dg_lib.CategoricalProbs, Dict[str, Any]]:
+  ) -> tuple[dg_lib.Sequences, dg_lib.CategoricalProbs, dict[str, Any]]:
     """Samples sequences and their categorical probabilities from programs.
 
     We run the programs on the UTM, retrieve the outputs, and pad them with

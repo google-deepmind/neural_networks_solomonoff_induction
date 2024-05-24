@@ -15,9 +15,9 @@
 
 """Context Tree Weighting data generator."""
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 import copy
-from typing import Any, Sequence
+from typing import Any
 
 import jaxtyping as jtp
 import numpy as np

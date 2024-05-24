@@ -1,11 +1,11 @@
 # Learning Universal Predictors
 
-This repository provides an implementation of our paper [Learning Universal Predictors](https://arxiv.org/abs/2401.14953).
+This repository provides an implementation of our ICML 2024 paper [Learning Universal Predictors](https://arxiv.org/abs/2401.14953).
 
 > Meta-learning has emerged as a powerful approach to train neural networks to learn new tasks quickly from limited data.
 Broad exposure to different tasks leads to versatile representations enabling general problem solving.
 But, what are the limits of meta-learning?
-In this work, we explore the potential of amortizing the most powerful universal predictor, namely Solomonoff Induction (SI), into neural networks via leveraging meta-learning to its limits.
+In this work, we explore the potential of amortizing the most powerful universal predictor, namely Solomonoff Induction(SI), into neural networks via leveraging meta-learning to its limits.
 We use Universal Turing Machines (UTMs) to generate training data used to expose networks to a broad range of patterns.
 We provide theoretical analysis of the UTM data generation processes and meta-training protocols.
 We conduct comprehensive experiments with neural architectures (e.g. LSTMs, Transformers) and algorithmic data generators of varying complexity and universality.
@@ -64,11 +64,40 @@ pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-re
 Note that the jax version must correspond to the existing CUDA installation you wish to use (CUDA 12 in the example above).
 Please see the [JAX documentation](https://github.com/google/jax#installation) for more details.
 
+### Chomsky Tasks
+
+This repository relies on code from https://github.com/google-deepmind/neural_networks_chomsky_hierarchy.
+To that end, we clone the repository and install its dependencies:
+To clone that repository, run
+```
+git clone https://github.com/google-deepmind/neural_networks_chomsky_hierarchy.git
+cd neural_networks_chomsky_hierarchy
+pip install -r requirements.txt
+cd ..
+```
+
+
+## Usage
+
+Before running any code, make sure to activate the conda environment and set the `PYTHONPATH`:
+
+```
+conda activate nnsi
+export PYTHONPATH=$(pwd)/..
+```
+
+We provide an example training script at `train.py`, which can be run with
+```
+python train.py
+```
+
+The exact hyperparameters used to reproduce our results can be found in Table 1 and Appendix D of our [paper](https://arxiv.org/abs/2401.14953).
+
 
 ## Citing This Work
 
 ```bibtex
-@article{grau2024learning,
+@inproceedings{grau2024learning,
   author       = {Jordi Grau{-}Moya and
                   Tim Genewein and
                   Marcus Hutter and
@@ -81,7 +110,7 @@ Please see the [JAX documentation](https://github.com/google/jax#installation) f
                   Matthew Aitchison and
                   Joel Veness},
   title        = {Learning Universal Predictors},
-  journal      = {arXiv:2401.14953},
+  booktitle    = {International Conference on Machine Learning},
   year         = {2024},
 }
 ```

@@ -23,7 +23,8 @@ prior.
 
 import abc
 import ast
-from typing import Any, Mapping, Sequence, Union
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import numpy as np
 
@@ -52,7 +53,7 @@ class UniversalTuringMachine(abc.ABC):
       memory_size: int,
       maximum_steps: int,
       max_output_length: int,
-  ) -> Mapping[str, Union[int, str]]:
+  ) -> Mapping[str, int | str]:
     """Returns an output string from a program run on the machine.
 
     Args:

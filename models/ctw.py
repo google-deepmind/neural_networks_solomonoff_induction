@@ -31,7 +31,7 @@ the modern GPUs, especially to process batches of sequences.
 import copy
 import dataclasses
 import enum
-from typing import Any, Union
+from typing import Any
 
 import jaxtyping as jtp
 import numpy as np
@@ -119,7 +119,7 @@ def _update_tree(
     true_prob_only: bool = False,
     train_mode: bool = False,
     max_capacity: int = DEFAULT_MAX_CAPACITY,
-) -> Union[np.ndarray, float]:
+) -> np.ndarray | float:
   """Updates the CTW tree.
 
   Args:

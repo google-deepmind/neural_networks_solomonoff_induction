@@ -18,7 +18,9 @@
 This is used in particular in the paper to sample from multiple Chomsky tasks.
 """
 
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
+
 import numpy as np
 
 from neural_networks_solomonoff_induction.data import data_generator as dg_lib

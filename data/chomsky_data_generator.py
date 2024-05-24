@@ -16,8 +16,8 @@
 """Data generator for a single Chomsky task.
 
 Tasks taken from the paper "Neural Networks and the Chomsky Hierarchy".
-Arxiv: https://arxiv.org/abs/2207.02098
-Github: https://github.com/google-deepmind/neural_networks_chomsky_hierarchy
+  - arXiv: https://arxiv.org/abs/2207.02098
+  - GitHub: https://github.com/google-deepmind/neural_networks_chomsky_hierarchy
 """
 
 from typing import Any
@@ -47,15 +47,18 @@ BINARY_TASKS = [
 ]
 
 ORDERED_TASKS = [
-    'even_pairs',  # Regular.
+    # Regular.
+    'even_pairs',
     'modular_arithmetic',
     'parity_check',
     'cycle_navigation',
-    'stack_manipulation',  # Context free.
+    # Context free.
+    'stack_manipulation',
     'reverse_string',
     'modular_arithmetic_brackets',
     'solve_equation',
-    'duplicate_string',  # Context sensitive.
+    # Context sensitive.
+    'duplicate_string',
     'missing_duplicate_string',
     'odds_first',
     'binary_addition',
