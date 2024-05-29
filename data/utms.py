@@ -260,6 +260,7 @@ class BrainPhoqueUTM(UniversalTuringMachine):
   Unlike the paper version, ',' is incuded and writes a uniformly random symbol to
   the work tape.
   Finally, outputs are returned with the instruction '.'.
+  See the reference above for more details.
 
   BrainPhoque (BP) differs slightly from BrainFuck (BF).
 
