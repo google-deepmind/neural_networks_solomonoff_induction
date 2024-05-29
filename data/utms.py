@@ -184,7 +184,6 @@ class MCSampler(ProgramSampler):
     counts = data['counts_dict']
     self._tokens = data['tokens']
     self._token_indices = {ch: idx for idx, ch in enumerate(self._tokens)}
-
     self._ctx_len = max(map(len, counts.keys()))
     # Turn the counts into distributions by normalizing them.
     self._distributions = {}
@@ -213,7 +212,7 @@ class MCSampler(ProgramSampler):
     # Note: prog[-2:] works fine even if prog is empty.
     ctx = program[-self._ctx_len :]
     dist = self._distributions.get(ctx, None)
-    instruction = self._rng.choice(self._tokens, p=dist)
+    instruction = self._rng.choice(list(self._tokens), p=dist)
     return instruction
 
   # WARNING: The probability of the short program may be lower
@@ -258,9 +257,9 @@ class BrainPhoqueUTM(UniversalTuringMachine):
   the boundaries of the interval.
   Moving the reading head on the data tape is done with the '>' and
   '<' instructions. Loops are created using the '[' and ']' instructions.
+  Unlike the paper version, ',' is incuded and writes a uniformly random symbol to
+  the work tape.
   Finally, outputs are returned with the instruction '.'.
-  Note that we omit the ',' which is used to read from the input.
-  See the reference above for more details.
 
   BrainPhoque (BP) differs slightly from BrainFuck (BF).
 
@@ -337,6 +336,7 @@ class BrainPhoqueUTM(UniversalTuringMachine):
       alphabet_size: int = 9,
       print_trace: bool = False,
       shorten_program: bool = False,
+      use_input_instruction = False,
   ):
     """Constructor.
 
@@ -353,6 +353,7 @@ class BrainPhoqueUTM(UniversalTuringMachine):
     self._alphabet_size = alphabet_size
     self._print_trace = print_trace
     self._shorten_program = shorten_program
+    self._use_input_instruction = use_input_instruction
     sampler.set_tokens(tokens=self.program_tokens)
 
   @property
@@ -363,17 +364,18 @@ class BrainPhoqueUTM(UniversalTuringMachine):
   @property
   def program_tokens(self) -> Sequence[str]:
     """Returns the tokens that can be used to write a BrainPhoque program.
+    
 
     Note that '{' is not included because when sampling a program an open
     bracket '[' is turned automatically into '{' if the data value is 0,
     and vice versa.
     """
-    return ['+', '-', '>', '<', '[', ']', '.']
+    return ['+', '-', '>', '<', '[', ']', '.'] + int(self._use_input_instruction) * [',']
 
   @property
   def program_valid_tokens(self) -> Sequence[str]:
     """Returns the tokens that can appear in a BrainPhoque program."""
-    return ['+', '-', '>', '<', '[', '{', ']', '.']
+    return ['+', '-', '>', '<', '[', '{', ']', '.'] + int(self._use_input_instruction) * [',']
 
   def run_program(
       self,
@@ -381,6 +383,7 @@ class BrainPhoqueUTM(UniversalTuringMachine):
       memory_size: int,
       maximum_steps: int,
       max_output_length: int,
+      input_symbols: list = None,
   ) -> RunResult:
     """Returns the output of a program on the BrainPhoque UTM.
 
@@ -435,6 +438,12 @@ class BrainPhoqueUTM(UniversalTuringMachine):
     # evaluation.
     first_sampled_idx_after_print = len(program)
 
+    if input_symbols is None:
+      input_symbols = []
+    inputs_read = 0
+    # Dictionary of input indices corresponding to each ','
+    reads = {}
+
     def make_result(status: str) -> RunResult:
       # This function is nested because it requires access to many of the
       # local variables of the enclosing function, and passing so many arguments
@@ -460,6 +469,14 @@ class BrainPhoqueUTM(UniversalTuringMachine):
       #   brackets.
       if self._shorten_program:
         short_program = []
+        # The shortened input will be filled with only the minimal necessary input
+        # symbols. None's correspond to reads that never take place because of removed
+        # ',' instructions.  
+        short_input_symbols = [None]*len(input_symbols)
+        # Because we make only one pass over the program, we need to track the original
+        # index position of the last ',' instruction so that its input symbols can be 
+        # erased if we determine they are overwritten by another ',' instruction.
+        prev_reads_idx = None
         # No need to include {'[': ']} because infinite loops that are evaluated
         # are removed automatically using `first_sampled_idx_after_print`, while
         # infinite loops that are skipped cannot be generated, since the open
@@ -491,7 +508,42 @@ class BrainPhoqueUTM(UniversalTuringMachine):
           if instruction == ']' and jumps[idx] == idx:
             # Remove ']' that jump to themselves (= skip).
             continue
+          if instruction == ',':
+            # Remove instructions with results erased by ','.
+            while (
+              short_program
+              and short_program[-1] in ['-','+']
+            ):
+              short_program.pop()
+            if (
+              short_program
+              and short_program[-1] == ','
+            ):
+              # Inputs for the previous ',' are not needed
+              for input_idx in reads[prev_reads_idx]:
+                short_input_symbols[input_idx] = None
+              short_program.pop()
+            # Inputs read by the current instruction may be needed
+            for input_idx in reads[idx]:
+              short_input_symbols[input_idx] = input_symbols[input_idx]
+            prev_reads_idx = idx
           if (
+            short_program
+            and short_program[-1] == ','
+            and instruction in ['-','+']
+          ):
+            # Modify the inputs read by ',' when they are immediately changed.
+            # This case is mutually exclusive with self-cancellation but both imply that
+            # instruction does not need to be appended.
+            # Because instruction is not ',', prev_reads_idx is the original index position
+            # of the previous ','. 
+            if instruction == '+':
+              for input_idx in reads[prev_reads_idx]:
+                short_input_symbols[input_idx] = (short_input_symbols[input_idx] + 1) % self._alphabet_size
+            elif instruction == '-':
+              for input_idx in reads[prev_reads_idx]:
+                short_input_symbols[input_idx] = (short_input_symbols[input_idx] - 1) % self._alphabet_size
+          elif (
               short_program
               and cancelling_ids.get(instruction, '') == short_program[-1]
           ):
@@ -501,13 +553,15 @@ class BrainPhoqueUTM(UniversalTuringMachine):
           else:
             short_program.append(instruction)
         short_program = ''.join(short_program)
+        short_input_symbols = list(filter(lambda x: x is not None, short_input_symbols))
         # Upper bound on the Solomonoff ln-loss. Note that we use
         # program_tokens and not program_valid_tokens because when sampling
         # we don't need to sample '{' (only '[').
-        short_ln_loss = self._sampler.program_ln_loss(short_program)
-        long_ln_loss = self._sampler.program_ln_loss(program2)
+        short_ln_loss = self._sampler.program_ln_loss(short_program) + len(short_input_symbols)*np.log(self._alphabet_size)
+        long_ln_loss = self._sampler.program_ln_loss(program2) + len(input_symbols)*np.log(self._alphabet_size)
       else:
         short_program = None
+        short_input_symbols = None
         short_ln_loss = None
         long_ln_loss = None
 
@@ -524,6 +578,8 @@ class BrainPhoqueUTM(UniversalTuringMachine):
           # for the generated output, based on `short_program`.
           'short_ln_loss': short_ln_loss,
           'long_ln_loss': long_ln_loss,
+          'input_symbols': input_symbols,
+          'short_input_symbols': short_input_symbols
       }
 
     # Program evaluation loop, possibly with program generation at the same
@@ -667,11 +723,23 @@ class BrainPhoqueUTM(UniversalTuringMachine):
           else:
             # -1 to ensure the next instruction is the opening bracket.
             program_index = jumps[program_index] - 1
+        case ',':
+          if inputs_read < len(input_symbols):
+            memory[memory_index] = input_symbols[inputs_read]
+          else:
+            random_symbol = np.random.choice(self._alphabet_size)
+            memory[memory_index] = random_symbol
+            input_symbols.append(random_symbol)
+          if program_index not in reads:
+            reads[program_index] = [inputs_read]
+          else:
+            reads[program_index].append(inputs_read)
+          inputs_read += 1         
         case _:
           raise IncorrectProgramError(
-              f'Character {command} is not recognized. All '
-              'characters in the input program must be part of the set ('
-              f'{",".join(self.program_tokens)}).',
+            f'Character {command} is not recognized. All '
+            'characters in the input program must be part of the set ('
+            f'{",".join(self.program_tokens)}).',
           )
       program_index += 1
       num_steps += 1
